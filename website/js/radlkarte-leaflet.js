@@ -112,8 +112,8 @@ function filter(type) {
     debug('filter: ' + type);
     debug('pre-filter-visibility: ' + rkGlobal.jsonLayersVisible);
     
-    $('div#connections a').removeClass('selected');
-    $('a#filter_'+type).addClass('selected');
+    //$('div#connections a').removeClass('selected');
+    //$('a#filter_'+type).addClass('selected');
     rkGlobal.currentFilter = type;
     
     // display network if previously hidden
@@ -171,36 +171,32 @@ function hideConnections() {
 }
 
 function onLocationFound(e) {
+    //L.marker(e.latlng).addTo(map);
+
     var radius = e.accuracy / 2;
+    // marker circle only for quite accurate positions
     if(radius > 1000) {
         if(rkGlobal.markerCircle != undefined) {
             map.remove(rkGlobal.markerCircle);
             rkGlobal.markerCircle = undefined;
         }
         //alert("You are within " + radius + " meters from this point (=too far away..)");
-        return;
-    }
-    //L.marker(e.latlng).addTo(map);
-    
-    if(rkGlobal.markerCircle == undefined)
-        rkGlobal.markerCircle = L.circle(e.latlng, radius).addTo(map);
-    else {
-        rkGlobal.markerCircle.setRadius(radius);
-        rkGlobal.markerCircle.setLatLng(e.latlng);
+    } else { 
+        if(rkGlobal.markerCircle == undefined)
+            rkGlobal.markerCircle = L.circle(e.latlng, radius).addTo(map);
+        else {
+            rkGlobal.markerCircle.setRadius(radius);
+            rkGlobal.markerCircle.setLatLng(e.latlng);
+        }
     }
 
-	//var zoom = Math.min(this.getBoundsZoom(bounds), options.maxZoom);
-	//this.setView(latlng, zoom);
-}
-
-/** copy/pasted from leaflet-src .. adapt to set view ! */
-function copypasted(pos) {
-	var latAccuracy = 180 * pos.coords.accuracy / 4e7,
+	// setView ourselves (because we want to have a minZoom)
+	var minZoom = 13;
+	var latAccuracy = 180 * e.accuracy / 4e7,
 		lngAccuracy = latAccuracy * 2,
 
-		lat = pos.coords.latitude,
-		lng = pos.coords.longitude,
-		latlng = new L.LatLng(lat, lng),
+		lat = e.latlng.lat,
+		lng = e.latlng.lng,
 
 		sw = new L.LatLng(lat - latAccuracy, lng - lngAccuracy),
 		ne = new L.LatLng(lat + latAccuracy, lng + lngAccuracy),
@@ -208,11 +204,13 @@ function copypasted(pos) {
 
 		options = this._locationOptions;
 
-	if (options.setView) {
-		var zoom = Math.min(this.getBoundsZoom(bounds), options.maxZoom);
-		this.setView(latlng, zoom);
-	}
+
+	var zoom = Math.min(map.getBoundsZoom(bounds), options.maxZoom);
+	// guarantee minZoom!
+	zoom = Math.max(zoom, minZoom);
+	this.setView(e.latlng, zoom);
 }
+
 
 function onLocationError(e) {
     //alert(e.message);
@@ -223,7 +221,6 @@ function toggleLocationTracking() {
         $('a#toggleLocationTracking').removeClass('selected');
         map.stopLocate();
     } else {
-        alert('start');
         $('a#toggleLocationTracking').addClass('selected');
         map.locate({
             watch: true,
@@ -236,6 +233,34 @@ function toggleLocationTracking() {
     rkGlobal.tracking = !rkGlobal.tracking;
 }
 
+function addOverlayControl() {
+    var legend = L.control({position: 'topright'});
+    legend.onAdd = function (map) {
+        var div = L.DomUtil.create('div', 'leaflet-control-layers leaflet-control leaflet-control-layers-expanded');
+        var inner = '';
+        //inner += '<div class="leaflet-top leaflet-right">';
+        //inner += '    <div class="leaflet-control-layers leaflet-control leaflet-control-layers-expanded">';
+        inner += '        <form class="leaflet-control-layers-list">';
+        inner += '            <div class="leaflet-control-layers-base">';
+        inner += '                <label>Wege durch Wien</label>';
+        inner += '            </div>';
+        inner += '            <div class="leaflet-control-layers-separator"></div>';
+        inner += '            <div class="leaflet-control-layers-base">';
+        inner += '                <label><input name="leaflet-base-layers" checked="checked" type="radio" onclick="filter(\'dangerous\');">Sichere Wege</label>';
+        inner += '                <label><input name="leaflet-base-layers" type="radio" onclick="filter(\'slow\');">Schnelle Wege</label>';
+        inner += '                <label><input name="leaflet-base-layers" type="radio" onclick="filter(\'none\');">Alle Wege</label>';
+        inner += '                <label><input name="leaflet-base-layers" type="radio" onclick="hideConnections();">Ausblenden</label>';
+        inner += '            </div>';
+        inner += '        </form>';
+        //inner += '    </div>';
+        //inner += '</div>';
+        div.innerHTML += inner;
+        return div;
+    };
+
+    map.addControl(legend);
+
+}
 // ------------------------------------------------------------------------ main
 
 function initMap() {
@@ -274,20 +299,23 @@ function initMap() {
         "Symbole": poiLayer
     };
     
-    L.control.layers(baseLayers, overlays, {collapsed: false}).addTo(map);
-    L.control.zoom({position : 'topright'}).addTo(map);
+    addOverlayControl();    
+    L.control.layers(baseLayers, overlays).addTo(map);
+    //L.control.layers(baseLayers, overlays, {collapsed: false}).addTo(map);
+    L.control.zoom({position : 'topleft'}).addTo(map);
 
     // callbacks
     window.onresize = setMapHeight();
     map.on('dblclick', function(e) { zoomByAbout(e) });
-    map.on('zoomend', function(e) { onZoom(); });    
+    map.on('zoomend', function(e) { onZoom(); });
     
     
-    // load overlay
+    // load overlay & control
     loadGeoJson();
     
     // register tracking
     map.on('locationfound', onLocationFound);
     map.on('locationerror', onLocationError);
+    toggleLocationTracking();
 }
 
