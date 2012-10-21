@@ -162,8 +162,8 @@ function getDesiredVisibility(layer, networkFilterType) {
 
 function hideConnections() {
     debug('hide connections..')
-    $('div#connections a').removeClass('selected');
-    $('a#connHide').addClass('selected');
+    //$('div#connections a').removeClass('selected');
+    //$('a#connHide').addClass('selected');
     if(rkGlobal.showLayer) {
         map.removeLayer(rkGlobal.layer);
         rkGlobal.showLayer = false;
