@@ -144,10 +144,10 @@ function filter(type) {
 function getDesiredVisibility(layer, networkFilterType) {
     properties = layer.feature.properties
     // filter details (depending on zoom level)
-    if (map.getZoom() <= 15) {
+    if (map.getZoom() < 15) {
         if(properties.detail == 'local')
             return false;
-         if(map.getZoom() <= 14 && properties.detail == 'regional')
+         if(map.getZoom() < 14 && properties.detail == 'regional')
             return false;
     }
     
@@ -216,12 +216,23 @@ function onLocationError(e) {
     //alert(e.message);
 }
 
+function getLocationOnce() {
+    if(rkGlobal.tracking) {
+        // ignore for now..
+        return;
+    }
+    map.locate({
+        watch: false,
+        enableHighAccuracy: true,
+        setView: false,
+        maxZoom: 16
+    });
+}
+
 function toggleLocationTracking() {
     if(rkGlobal.tracking) {
-        $('a#toggleLocationTracking').removeClass('selected');
         map.stopLocate();
     } else {
-        $('a#toggleLocationTracking').addClass('selected');
         map.locate({
             watch: true,
             enableHighAccuracy: true,
@@ -261,6 +272,18 @@ function addOverlayControl() {
     map.addControl(legend);
 
 }
+
+function addGpsControl() {
+    var gpsControl = L.control({position: 'topleft'});
+    gpsControl.onAdd = function (map) {
+        var div = L.DomUtil.create('div', 'leaflet-control-zoom leaflet-control');
+        var inner = '<a title="Go to current location" href="#" onclick="getLocationOnce();" class="leaflet-control-gps"></a>';
+        div.innerHTML += inner;
+        return div;
+    };
+    map.addControl(gpsControl);
+}
+
 // ------------------------------------------------------------------------ main
 
 function initMap() {
@@ -303,6 +326,7 @@ function initMap() {
     L.control.layers(baseLayers, overlays).addTo(map);
     //L.control.layers(baseLayers, overlays, {collapsed: false}).addTo(map);
     L.control.zoom({position : 'topleft'}).addTo(map);
+    addGpsControl();
 
     // callbacks
     window.onresize = setMapHeight();
@@ -316,6 +340,6 @@ function initMap() {
     // register tracking
     map.on('locationfound', onLocationFound);
     map.on('locationerror', onLocationError);
-    toggleLocationTracking();
+    //toggleLocationTracking();
 }
 
