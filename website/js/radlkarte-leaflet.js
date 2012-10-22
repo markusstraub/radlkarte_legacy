@@ -341,5 +341,11 @@ function initMap() {
     map.on('locationfound', onLocationFound);
     map.on('locationerror', onLocationError);
     //toggleLocationTracking();
+    
+    // extra behaviour on small screens
+    if($(window).width() < 800) {
+        map.removeControl(map.attributionControl);
+        
+    }
 }
 

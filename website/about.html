@@ -2,56 +2,82 @@
 <head>
 	<meta charset="utf-8" />
 	<title>radlkarte.at - handoptimierte, alltagstaugliche Wege durch Wien</title>
-    <link rel="stylesheet" href="style.css" type="text/css" />
+	<link rel="stylesheet" href="css/skeleton/base.css">
+	<link rel="stylesheet" href="css/skeleton/skeleton.css">
+	<link rel="stylesheet" href="css/skeleton/layout.css">
 </head>
 
 <body>
-<h1>Beschreibung</h1>
-Die Wegstrecken sind in 3 + 1 Kategorien unterteilt:
-Ausflugsqualität: außergewöhnlich schön und ruhig, kein Autoverkehr; Empfehlung für Radler mit Kindern
-Gemütlich: vom Autoverkehr getrennter Radweg oder sehr verkehrsarme Strecke; Empfehlung für Ungeübte oder gemütliche Fahrten 
-Durchschnittlich: Radeln im Autoverkehr, aber ohne besondere Platznot.
-Stressig: schnelle aber verkehrsreiche Verbindung (LKWs, hohes Tempo) oder Gefahrenstelle, mit Vorsicht genießen; längere Abschnitte nur für erfahrene Radler empfohlen. 
+<div class="container">
 
-<p>Die Radlkarte hilft dir bei der Orientierung in Wien: ein Wegenetz zeight Alltagswege, die Karte darunter liefert radfahrrelevante Details.</p>
-<p>Das grobmaschig gehaltenes Netz von gesammelten Alltagswegen soll einen Überblick über erprobte Routenvarianten z.b. zwischen zwei Bezirken geben. Die Wahl ob schnell oder gemütlich liegt bei dir: verkehrsreiche aber dafür direkte Verbindungen gibt es ebenso wie die gemütlichen aber langsameren Alternativen.</p>
-<p>Wie die letzten Häuserblöcke zum Ziel erreicht werden kannst du dann auf der Karte sehen. Für Räder geöffneten Einbahnen und Fußgängerzonen, Mehrzweckstreifen und Radwege zeigen dir alle Möglichkeiten. Radgeschäfte, U-Bahn- und Citybike-Stationen fehlen natürlich auch nicht.</p>
+	<div class="sixteen columns">
+		<h1><a href="http://www.radlkarte.at">radlkarte.at</a></h1>
+		<hr />
+	</div>
 
-<h2>FAQ:</h2>
-Q: Vor meinem Haus gib's einen Radweg, wieso fehlt er in der Radlkarte?<br/>
-A: Die Radlkarte basiert auf OpenStreetMap, was wie Wikipedia funktioniert. Wenn du den Fehler dort behebst ist er in Kürze auch in der Radlkarte behoben.<br/>
-<br/>
-Q: Ich fahre oft vom Xten in den Yten Bezirk, ich kenn da noch einen feinen Weg!<br/>
-A: Super, zeichne ich gerne ein! Bitte beschreib ihn auf der Wall, oder schick mir einen GPS-Track.
+    <div class="one-third column">
+        <h2>Die Idee</h2>
+        <p>radlkarte.at hilft dir bei der Orientierung in Wien: ein Wegenetz zeight Alltagswege, die Karte darunter liefert radfahrrelevante Details.</p>
+        <p>Das grobmaschig gehaltenes Netz von gesammelten Alltagswegen soll einen Überblick über erprobte Routenvarianten z.b. zwischen zwei Bezirken geben. Die Wahl ob schnell oder gemütlich liegt bei dir: verkehrsreiche aber dafür direkte Verbindungen gibt es ebenso wie die gemütlichen aber langsameren Alternativen.</p>
+        <p>Wie die letzten Häuserblöcke zum Ziel erreicht werden kannst du dann auf der Karte sehen. Für Räder geöffneten Einbahnen und Fußgängerzonen, Mehrzweckstreifen und Radwege zeigen dir alle Möglichkeiten. Radgeschäfte, U-Bahn- und Citybike-Stationen fehlen natürlich auch nicht.</p>
+    </div>
+    
+    <div class="one-third column">
+        <h2>Wegenetz</h2>
+        <p>Die auf radlkarte.at eingezeichneten Wege sind in vier Kategorien unterteilt:</p>
+        <ul class="square">
+        <li><strong>Premium</strong>: außergewöhnlich schön und ruhig, kein Autoverkehr; Empfehlung für Radler mit Kindern oder Ausflugslaune.</li>
+        <li><strong>Gemütlich</strong>: vom Autoverkehr getrennter Radweg oder sehr verkehrsarme Strecke; Empfehlung für Ungeübte oder gemütliche Fahrten.</li>
+        <li><strong>Durchschnittlich</strong>: Radeln im Autoverkehr, aber ohne besondere Platznot.</li>
+        <li><strong>Stressig</strong>: schnelle aber unangenehme Verbindung (viel Verkehr / LKWs / hohes Tempo / ...) oder Gefahrenstelle, mit Vorsicht genießen; längere Abschnitte nur für erfahrene Radler empfohlen.</li>
+        </ul>
+        <p>Einbahnen werden dünn gezeichnet.</p>
+    </div>
 
+    <div class="one-third column">
+        <h2>Hintergrundkarte</h2>
 
-<h1>Legende</h1>
-<h2>Empfohlene Wege:</h2>
-<img src="data/legend_wege.png"/>
+        <h3>Radwege</h3>
+        <p>
+        Dunkelgrün: getrennter Radweg<br/>
+        Hellgrün: Fahrradstreifen auf der Fahrbahn
+        </p>
 
-<h2>Radwege:</h2>
-Dunkelgrün: getrennter Radweg<br/>
-Hellgrün: Fahrradstreifen auf der Fahrbahn
+        <h3>Straßen</h3>
+        <p>
+        Grau: Fahrverbot für Fahrräder<br/>
+        Braun: nicht asphaltiert (z.B. Feldweg)<br/>
+        Grau gepunktet: Stiege<br/>
+        Einbahnpfeil: Einbahn gilt auch für Radfahrer<br/>
+        Dunkelgrau strichliert: Gleise
+        </p>
 
-<h2>Straßen:</h2>
-Grau: Fahrverbot für Fahrräder<br/>
-Braun: nicht asphaltiert (z.B. Feldweg)<br/>
-Grau gepunktet: Stiege<br/>
-Einbahnpfeil: Einbahn gilt auch für Radfahrer<br/>
-Dunkelgrau strichliert: Gleise
-
-<h2>Symbole:</h2>
-Grüne Quadrate: Radabstellmöglichkeiten<br/>
-Blaue Quadrate: Öffihaltestellen
-
-<h2>Synchronisation mit <a href="http://www.openstreetmap.org" target="_blank">OpenStreetMap</a>:</h2>
-Jeden Sonntag um 2 Uhr früh
-
-<h2>Kontakt:</h2>
-Markus Straub<br/>
-Porzellangasse 33a<br/>
-1090 Wien<br/>
-markus.straub.at@gmail.com
-
+        <h3>Symbole</h3>
+        <p>
+        Grüne Quadrate: Radabstellmöglichkeiten<br/>
+        Blaue Quadrate: Öffihaltestellen
+        </p>
+    </div>
+    <hr/>
+    <div class="two-thirds column">
+        <h2>FAQ</h2>
+        <p>
+        Q: Vor meinem Haus gib's einen Radweg, wieso fehlt er in radlkarte.at?<br/>
+        A: radlkarte.at basiert auf <a href="http://www.openstreetmap.org" target="_blank">OpenStreetMap</a>, was im Prinzip wie Wikipedia funktioniert. Wenn du den Fehler dort behebst ist er in Kürze auch in der Radlkarte behoben. Genau genommen synchronisiert sich radlkarte.at jeden Sonntag um 2 Uhr früh mit OpenStreetMap.
+        <br/><br/>
+        Q: Ich fahre oft vom Xten in den Yten Bezirk, ich kenn da noch einen feinen Weg!<br/>
+        A: Super, zeichne ich gerne ein, schreib mir einfach ein Email!
+        </p>
+    </div>
+    <div class="one-third column">
+        <h2>Kontakt</h2>
+        <p>
+        Markus Straub<br/>
+        Porzellangasse 33a<br/>
+        1090 Wien<br/>
+        markus.straub.at@gmail.com
+        </p>
+    </div>
+</div>
 </body>
 </html>
