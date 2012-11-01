@@ -284,6 +284,14 @@ function addGpsControl() {
     map.addControl(gpsControl);
 }
 
+function getURLParameter(name) {
+    return decodeURI(
+        (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
+    );
+}
+
+
+
 // ------------------------------------------------------------------------ main
 
 function initMap() {
@@ -309,6 +317,13 @@ function initMap() {
     var rkLowLayer = L.tileLayer('http://radlkarte.at/minimal_radl/{z}/{x}/{y}.png', {attribution: rkAttrib});
     var osmLayer = L.tileLayer('http://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: osmAttrib});
     var poiLayer = L.tileLayer('http://radlkarte.at/stable_poi/{z}/{x}/{y}.png').addTo(map);
+    if(getURLParameter("dev") == "yes") {
+        map.removeLayer(rkLayer);
+        map.removeLayer(poiLayer);
+        var rkDevLayer = L.tileLayer('http://radlkarte.at/dev/{z}/{x}/{y}.png', {attribution: rkAttrib}).addTo(map);
+        var poiDevLayer = L.tileLayer('http://radlkarte.at/dev_poi/{z}/{x}/{y}.png').addTo(map);
+    }
+    
     var emptyLayer = L.tileLayer('', {attribution: emptyAttrib});
 
     var baseLayers = {
@@ -321,6 +336,11 @@ function initMap() {
     var overlays = {
         "Symbole": poiLayer
     };
+
+    if(getURLParameter("dev") == "yes") {
+        baseLayers["Radlkarte_DEV"] = rkDevLayer;
+        overlays["Symbole_DEV"] = poiDevLayer;
+    }
     
     addOverlayControl();    
     L.control.layers(baseLayers, overlays).addTo(map);
