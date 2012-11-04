@@ -1,6 +1,4 @@
 <!DOCTYPE html>
-<!-- for g+ -->
-<html itemscope itemtype="http://schema.org/Product">
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -17,6 +15,8 @@
     <!--[if lte IE 8]>
         <link rel="stylesheet" href="js/leaflet-0.4.5/leaflet.ie.css" />
     <![endif]-->
+    
+    <!-- google analytics -->
     <script type="text/javascript">
         var _gaq = _gaq || [];
         _gaq.push(['_setAccount', 'UA-25564832-1']);
@@ -45,28 +45,25 @@
         
         <div id="connections" class ="shadowy">
             <div>
-                <input id="address" type="textbox" value="Michaelerplatz">
+                <input id="address" type="textbox" value="Michaelerplatz, Wien" onclick="clickClear(this, 'Michaelerplatz, Wien')" onblur="clickRecall(this,'Michaelerplatz, Wien')" />
                 <input type="submit" value="↵" onclick="codeAddress()">
             </div>
+            <script type="text/javascript">
+            function clickClear(thisfield, defaulttext) {
+                    if (thisfield.value == defaulttext) {
+                        thisfield.value = "";
+                    }
+                }
+            function clickRecall(thisfield, defaulttext) {
+                if (thisfield.value == "") {
+                    thisfield.value = defaulttext;
+                }
+            }
+            </script>
         
             <!-- facebook like & send -->
 	        <div class="fb-like" data-href="http://www.radlkarte.at" data-send="true" data-layout="button_count" data-width="150" data-show-faces="true"></div>
-	        
-	        <!-- g+ +1 button -->
-            <g:plusone size="small" href="http://www.radlkarte.at"></g:plusone>
-
-            <!-- g+ script -->
-            <script type="text/javascript">
-              window.___gcfg = {lang: 'de'};
-
-              (function() {
-                var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-                po.src = 'https://apis.google.com/js/plusone.js';
-                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-              })();
-            </script>
 	    </div>
-        
     </div>
     
     <!-- map container with mandatory height definition -->
