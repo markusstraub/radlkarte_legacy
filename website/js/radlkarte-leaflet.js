@@ -27,18 +27,32 @@ function zoomByAbout(e) {
 
 function loadGeoJson() {
     // load GeoJSON layer (in separate thread)
-    $.getJSON("data/wege-durch-wien.geojson", function(data) {   
+    $.getJSON("data/wege-durch-wien.geojson", function(data) {
         // add all geojson objects to the layer and style them
+        var cnt = 0;
+        var cntGood = 0;
         rkGlobal.layer = L.geoJson(data, {
-            style: function(feature) { return styleGeoJson(feature); }
+            style: function(feature) {
+                cnt++;
+                // ignore invalid entries
+                if(feature.geometry.type != "LineString" || feature.properties == undefined) {
+                    return;
+                } else {
+                    cntGood++;
+                    return styleGeoJson(feature);
+                }
+            }
         }).addTo(rkGlobal.map);
+        debug('styled geojson. ' + cnt + ' total, ' + cntGood + ' styled');
         
-        // filter out empty objects & put the rest into an array
+        // filter out empty/invalid objects & put the rest into an array
         var cnt = 0;
         var cntGood = 0;
         rkGlobal.layer.eachLayer(function (layer) {
             cnt++;
-            if(layer.feature.geometry.coordinates.length == 0) {
+            if(layer.feature.geometry.type != "LineString" || layer.feature.properties == undefined || layer.feature.geometry.coordinates.length == 0) {
+                debug("removing feature:");
+                debug(layer.feature);
                 rkGlobal.layer.removeLayer(layer);
                 return;
             }
@@ -48,13 +62,16 @@ function loadGeoJson() {
         });
         debug(rkGlobal.jsonLayers);
         debug(rkGlobal.jsonLayersVisible);
-        debug('finished loading geojson. ' + cnt + ' total, ' + cntGood + ' displayed');
-        
+        debug('finished loading geojson. ' + cnt + ' total, ' + cntGood + ' in result');
         // init-filtering
         filter(rkGlobal.currentFilter);
     });
 }
 
+/** 
+expects: a feature (linestring) with properties
+returns: a style for the feature depending on the properties
+*/
 function styleGeoJson(feature) {
     var currentZoom = (rkGlobal.map.getZoom()-10)*2.4;
     // unfortunately there is no easy way to draw arrows for oneways..
