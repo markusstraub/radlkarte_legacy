@@ -13,9 +13,9 @@
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css" type="text/css" />
-	<link rel="stylesheet" href="js/leaflet-0.4.4/leaflet.css" />
+	<link rel="stylesheet" href="js/leaflet-0.4.5/leaflet.css" />
     <!--[if lte IE 8]>
-        <link rel="stylesheet" href="js/leaflet-0.4.4/leaflet.ie.css" />
+        <link rel="stylesheet" href="js/leaflet-0.4.5/leaflet.ie.css" />
     <![endif]-->
     <script type="text/javascript">
         var _gaq = _gaq || [];
@@ -46,7 +46,7 @@
         <div id="connections" class ="shadowy">
             <div>
                 <input id="address" type="textbox" value="Michaelerplatz">
-                <input type="button" value="Suchen" onclick="codeAddress()">
+                <input type="submit" value="↵" onclick="codeAddress()">
             </div>
         
             <!-- facebook like & send -->
@@ -103,7 +103,7 @@
     $("#legend").hover(
         function () {
             $('#legend-text').show();
-        }, 
+        },
         function () {
             $('#legend-text').hide();
         }
@@ -111,7 +111,7 @@
     </script>
     
     <!-- load leaflet and initialize map -->
-	<script src="js/leaflet-0.4.4/leaflet-src.js"></script>
+	<script src="js/leaflet-0.4.5/leaflet-src.js"></script>
 	<!-- no official permalink feature, so we use a plugin. see https://github.com/CloudMade/Leaflet/issues/362 -->
 	<script src="js/leaflet-hash.js"></script>
 	<script src="js/radlkarte-globals.js"></script>

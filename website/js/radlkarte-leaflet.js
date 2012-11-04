@@ -151,25 +151,30 @@ function hideConnections() {
     }
 }
 
-function onLocationFound(e) {
-    //L.marker(e.latlng).addTo(rkGlobal.map);
-
-    var radius = e.accuracy / 2;
-    // marker circle only for quite accurate positions
-    if(radius > 1000) {
-        if(rkGlobal.markerCircle != undefined) {
-            rkGlobal.map.remove(rkGlobal.markerCircle);
-            rkGlobal.markerCircle = undefined;
-        }
-        //alert("You are within " + radius + " meters from this point (=too far away..)");
-    } else { 
-        if(rkGlobal.markerCircle == undefined)
-            rkGlobal.markerCircle = L.circle(e.latlng, radius).addTo(rkGlobal.map);
-        else {
-            rkGlobal.markerCircle.setRadius(radius);
-            rkGlobal.markerCircle.setLatLng(e.latlng);
+function showMarkerCircle(latlng, radius, timeoutSeconds) {
+    // disable old hiding timeout
+    clearTimeout(rkGlobal.markerCircleTimeout);
+    
+    if(rkGlobal.markerCircle == undefined)
+        rkGlobal.markerCircle = L.circle(latlng, radius).addTo(rkGlobal.map);
+    else {
+        rkGlobal.markerCircle.setLatLng(latlng);
+        rkGlobal.markerCircle.setRadius(radius);
+        if(!rkGlobal.map.hasLayer(rkGlobal.markerCircle)) {
+            rkGlobal.map.addLayer(rkGlobal.markerCircle);
         }
     }
+    
+    rkGlobal.markerCircleTimeout = setTimeout('hideMarkerCircle()', timeoutSeconds * 1000);
+}
+
+function hideMarkerCircle() {
+    rkGlobal.map.removeLayer(rkGlobal.markerCircle);
+}
+
+function onLocationFound(e) {
+    var radius = e.accuracy / 2;
+    showMarkerCircle(e.latlng, radius, 10);
 
 	// setView ourselves (because we want to have a minZoom)
 	var minZoom = 13;

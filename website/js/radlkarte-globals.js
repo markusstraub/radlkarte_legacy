@@ -10,7 +10,8 @@ rkGlobal.jsonLayersVisible = new Array();
 rkGlobal.layer; // radlkarte-overlay layer displaying the geojson objects
 rkGlobal.showLayer = true;
 rkGlobal.tracking = false;
-rkGlobal.markerCirle = undefined;
+rkGlobal.markerCirle = undefined; // marker circle used to show mapmatched / geolocated position
+rkGlobal.markerCircleTimeout = undefined; // timeout event to hide the marker circle
 
 
 function debug(obj) {

@@ -1,13 +1,12 @@
-// this script requires radlkarte-leaflet.js
-
-var geocoder = new google.maps.Geocoder();
+rkGlobal.geocoder = new google.maps.Geocoder();
 
 function codeAddress() {
     var address = document.getElementById('address').value;
-    geocoder.geocode( { 'address': address, 'region': 'AT'}, function(results, status) {
+    rkGlobal.geocoder.geocode( { 'address': address, 'region': 'AT'}, function(results, status) {
         if (status == google.maps.GeocoderStatus.OK) {
-            map.setView([results[0].geometry.location.lat(),results[0].geometry.location.lng()], 17);
-            L.circle([results[0].geometry.location.lat(),results[0].geometry.location.lng()], 20).addTo(map);
+            rkGlobal.map.setView([results[0].geometry.location.lat(),results[0].geometry.location.lng()], 17);
+            showMarkerCircle([results[0].geometry.location.lat(),results[0].geometry.location.lng()], 20, 10);
+            //L.circle([results[0].geometry.location.lat(),results[0].geometry.location.lng()], 20).addTo(map);
         } else {
             alert('Geocode was not successful for the following reason: ' + status);
         }
