@@ -137,5 +137,9 @@ a:hover {
 }
 
 .leaflet-control-gps {
-	background-image: url(../data/location.png);
+	background-image: url(../img/location.png);
+}
+
+input#address {
+    width: 180pt;
 }
