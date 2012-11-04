@@ -32,36 +32,42 @@
 
 <body>
 
-<div id="wrap">
-    <!-- facebook init -->
-    <div id="fb-root"></div>
-    <script>(function(d, s, id) {
-      var js, fjs = d.getElementsByTagName(s)[0];
-      if (d.getElementById(id)) return;
-      js = d.createElement(s); js.id = id;
-      js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
-      fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'facebook-jssdk'));</script>
-    
-    <div id="connections" class ="shadowy">
-        <!-- facebook like & send -->
-	    <div class="fb-like" data-href="http://www.radlkarte.at" data-send="true" data-layout="button_count" data-width="150" data-show-faces="true"></div>
-	    
-	    <!-- g+ +1 button -->
-        <g:plusone size="small" href="http://www.radlkarte.at"></g:plusone>
+    <div id="wrap">
+        <!-- facebook init -->
+        <div id="fb-root"></div>
+        <script>(function(d, s, id) {
+          var js, fjs = d.getElementsByTagName(s)[0];
+          if (d.getElementById(id)) return;
+          js = d.createElement(s); js.id = id;
+          js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+          fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));</script>
+        
+        <div id="connections" class ="shadowy">
+            <div>
+                <input id="address" type="textbox" value="Michaelerplatz">
+                <input type="button" value="Suchen" onclick="codeAddress()">
+            </div>
+        
+            <!-- facebook like & send -->
+	        <div class="fb-like" data-href="http://www.radlkarte.at" data-send="true" data-layout="button_count" data-width="150" data-show-faces="true"></div>
+	        
+	        <!-- g+ +1 button -->
+            <g:plusone size="small" href="http://www.radlkarte.at"></g:plusone>
 
-        <!-- g+ script -->
-        <script type="text/javascript">
-          window.___gcfg = {lang: 'de'};
+            <!-- g+ script -->
+            <script type="text/javascript">
+              window.___gcfg = {lang: 'de'};
 
-          (function() {
-            var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-            po.src = 'https://apis.google.com/js/plusone.js';
-            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-          })();
-        </script>
-	</div>
-</div>
+              (function() {
+                var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+                po.src = 'https://apis.google.com/js/plusone.js';
+                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+              })();
+            </script>
+	    </div>
+        
+    </div>
     
     <!-- map container with mandatory height definition -->
 	<div id="map"></div>
@@ -104,9 +110,25 @@
     );
     </script>
     
+    <!-- load leaflet and initialize map -->
 	<script src="js/leaflet-0.4.4/leaflet-src.js"></script>
 	<!-- no official permalink feature, so we use a plugin. see https://github.com/CloudMade/Leaflet/issues/362 -->
 	<script src="js/leaflet-hash.js"></script>
+	<script src="js/radlkarte-globals.js"></script>
 	<script src="js/radlkarte-leaflet.js"></script>
+	<script>
+	    initMap();
+	</script>
+	
+    <!-- google maps api (for geocoding) -->
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <script src="js/geocoding.js"></script>
+    <script>
+    $("#address").keypress(function(event) {
+        if ( event.which == 13 ) {
+            codeAddress();
+        }
+    });
+    </script>
 </body>
 </html>

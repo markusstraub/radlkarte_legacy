@@ -1,57 +1,38 @@
-var map;
-
-var rkGlobal = {}; // global variable for radlkarte properties / data storage
-rkGlobal.debug = false;
-rkGlobal.currentFilter = 'dangerous';
-rkGlobal.jsonLayers = new Array();
-rkGlobal.jsonLayersVisible = new Array();
-rkGlobal.layer; // radlkarte-overlay layer displaying the geojson objects
-rkGlobal.showLayer = true;
-rkGlobal.tracking = false;
-rkGlobal.markerCirle = undefined;
-
-initMap();
-
-function debug(obj) {
-    if(rkGlobal.debug)
-        console.log(obj);
-}
-
 function setMapHeight()
 {
-    // requires initialized map
-    // make map take up all available space (taken from https://github.com/elidupuis/leaflet.zoomfs)
-    var container = map._container;
+    // requires initialized rkGlobal.map
+    // make rkGlobal.map take up all available space (taken from https://github.com/elidupuis/leaflet.zoomfs)
+    var container = rkGlobal.map._container;
     container.style.position = 'fixed';
     container.style.left = 0;
     container.style.top = 0;
     container.style.width = '100%';
     container.style.height = '100%';
     L.DomUtil.addClass(container, 'leaflet-fullscreen');
-    map.invalidateSize();
+    rkGlobal.map.invalidateSize();
 }
 
 /** zoom to point of origin */
 function zoomByAbout(e) {
-    // requires initialized map
+    // requires initialized rkGlobal.map
     var x = .5*$('#map').width(),
         y = .5*$('#map').height(),
         mouse_point = e.containerPoint,
         new_center_point = new L.Point((x + mouse_point.x) / 2, (y + mouse_point.y) / 2),
-        new_center_location = map.containerPointToLatLng(new_center_point);
+        new_center_location = rkGlobal.map.containerPointToLatLng(new_center_point);
                
-    map.setView(new_center_location, map.getZoom() + 1); 
+    rkGlobal.map.setView(new_center_location, rkGlobal.map.getZoom() + 1); 
 }
 
 // ----------------------------------------------------------- geojson functions
 
 function loadGeoJson() {
     // load GeoJSON layer (in separate thread)
-    $.getJSON("data/wege-durch-wien.geojson", function(data) {
+    $.getJSON("data/wege-durch-wien.geojson", function(data) {   
         // add all geojson objects to the layer and style them
         rkGlobal.layer = L.geoJson(data, {
             style: function(feature) { return styleGeoJson(feature); }
-        }).addTo(map);
+        }).addTo(rkGlobal.map);
         
         // filter out empty objects & put the rest into an array
         var cnt = 0;
@@ -76,7 +57,7 @@ function loadGeoJson() {
 }
 
 function styleGeoJson(feature) {
-    var currentZoom = (map.getZoom()-10)*2.4;
+    var currentZoom = (rkGlobal.map.getZoom()-10)*2.4;
     // unfortunately there is no easy way to draw arrows for oneways..
     // https://github.com/CloudMade/Leaflet/issues/386
     var onewayDivisionFactor = 1;
@@ -118,7 +99,7 @@ function filter(type) {
     
     // display network if previously hidden
     if(!rkGlobal.showLayer) {
-        map.addLayer(rkGlobal.layer);
+        rkGlobal.map.addLayer(rkGlobal.layer);
         rkGlobal.showLayer = true;
     }
     
@@ -144,10 +125,10 @@ function filter(type) {
 function getDesiredVisibility(layer, networkFilterType) {
     properties = layer.feature.properties
     // filter details (depending on zoom level)
-    if (map.getZoom() < 15) {
+    if (rkGlobal.map.getZoom() < 15) {
         if(properties.detail == 'local')
             return false;
-         if(map.getZoom() < 14 && properties.detail == 'regional')
+         if(rkGlobal.map.getZoom() < 14 && properties.detail == 'regional')
             return false;
     }
     
@@ -165,25 +146,25 @@ function hideConnections() {
     //$('div#connections a').removeClass('selected');
     //$('a#connHide').addClass('selected');
     if(rkGlobal.showLayer) {
-        map.removeLayer(rkGlobal.layer);
+        rkGlobal.map.removeLayer(rkGlobal.layer);
         rkGlobal.showLayer = false;
     }
 }
 
 function onLocationFound(e) {
-    //L.marker(e.latlng).addTo(map);
+    //L.marker(e.latlng).addTo(rkGlobal.map);
 
     var radius = e.accuracy / 2;
     // marker circle only for quite accurate positions
     if(radius > 1000) {
         if(rkGlobal.markerCircle != undefined) {
-            map.remove(rkGlobal.markerCircle);
+            rkGlobal.map.remove(rkGlobal.markerCircle);
             rkGlobal.markerCircle = undefined;
         }
         //alert("You are within " + radius + " meters from this point (=too far away..)");
     } else { 
         if(rkGlobal.markerCircle == undefined)
-            rkGlobal.markerCircle = L.circle(e.latlng, radius).addTo(map);
+            rkGlobal.markerCircle = L.circle(e.latlng, radius).addTo(rkGlobal.map);
         else {
             rkGlobal.markerCircle.setRadius(radius);
             rkGlobal.markerCircle.setLatLng(e.latlng);
@@ -205,7 +186,7 @@ function onLocationFound(e) {
 		options = this._locationOptions;
 
 
-	var zoom = Math.min(map.getBoundsZoom(bounds), options.maxZoom);
+	var zoom = Math.min(rkGlobal.map.getBoundsZoom(bounds), options.maxZoom);
 	// guarantee minZoom!
 	zoom = Math.max(zoom, minZoom);
 	this.setView(e.latlng, zoom);
@@ -221,7 +202,7 @@ function getLocationOnce() {
         // ignore for now..
         return;
     }
-    map.locate({
+    rkGlobal.map.locate({
         watch: false,
         enableHighAccuracy: true,
         setView: false,
@@ -231,9 +212,9 @@ function getLocationOnce() {
 
 function toggleLocationTracking() {
     if(rkGlobal.tracking) {
-        map.stopLocate();
+        rkGlobal.map.stopLocate();
     } else {
-        map.locate({
+        rkGlobal.map.locate({
             watch: true,
             enableHighAccuracy: true,
             setView: false,
@@ -269,7 +250,7 @@ function addOverlayControl() {
         return div;
     };
 
-    map.addControl(legend);
+    rkGlobal.map.addControl(legend);
 
 }
 
@@ -281,7 +262,7 @@ function addGpsControl() {
         div.innerHTML += inner;
         return div;
     };
-    map.addControl(gpsControl);
+    rkGlobal.map.addControl(gpsControl);
 }
 
 function getURLParameter(name) {
@@ -295,8 +276,8 @@ function getURLParameter(name) {
 // ------------------------------------------------------------------------ main
 
 function initMap() {
-    // set up map
-    map = L.map('map', {
+    // set up rkGlobal.map
+    rkGlobal.map = L.map('map', {
         doubleClickZoom: false,
         keyboardPanOffset: 200,
         zoomControl: false,
@@ -305,7 +286,7 @@ function initMap() {
         maxBounds: [[46.3,9.4], [49.1,17.3]]
     });
     setMapHeight();
-    var hash = new L.Hash(map);
+    var hash = new L.Hash(rkGlobal.map);
 
     
     // add layers
@@ -313,15 +294,15 @@ function initMap() {
     var osmAttrib = 'Map data &copy; <a href="http://www.openstreetmap.org" target="_blank">OpenStreetMap</a> contributors, Wege durch Wien &copy; Heinrich Flickschuh & Markus Straub';
     var emptyAttrib = 'Wege durch Wien &copy; Heinrich Flickschuh & Markus Straub';
     
-    var rkLayer = L.tileLayer('http://radlkarte.at/stable/{z}/{x}/{y}.png', {attribution: rkAttrib}).addTo(map);
+    var rkLayer = L.tileLayer('http://radlkarte.at/stable/{z}/{x}/{y}.png', {attribution: rkAttrib}).addTo(rkGlobal.map);
     var rkLowLayer = L.tileLayer('http://radlkarte.at/minimal_radl/{z}/{x}/{y}.png', {attribution: rkAttrib});
     var osmLayer = L.tileLayer('http://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: osmAttrib});
-    var poiLayer = L.tileLayer('http://radlkarte.at/stable_poi/{z}/{x}/{y}.png').addTo(map);
+    var poiLayer = L.tileLayer('http://radlkarte.at/stable_poi/{z}/{x}/{y}.png').addTo(rkGlobal.map);
     if(getURLParameter("dev") == "yes") {
-        map.removeLayer(rkLayer);
-        map.removeLayer(poiLayer);
-        var rkDevLayer = L.tileLayer('http://radlkarte.at/dev/{z}/{x}/{y}.png', {attribution: rkAttrib}).addTo(map);
-        var poiDevLayer = L.tileLayer('http://radlkarte.at/dev_poi/{z}/{x}/{y}.png').addTo(map);
+        rkGlobal.map.removeLayer(rkLayer);
+        rkGlobal.map.removeLayer(poiLayer);
+        var rkDevLayer = L.tileLayer('http://radlkarte.at/dev/{z}/{x}/{y}.png', {attribution: rkAttrib}).addTo(rkGlobal.map);
+        var poiDevLayer = L.tileLayer('http://radlkarte.at/dev_poi/{z}/{x}/{y}.png').addTo(rkGlobal.map);
     }
     
     var emptyLayer = L.tileLayer('', {attribution: emptyAttrib});
@@ -343,28 +324,28 @@ function initMap() {
     }
     
     addOverlayControl();    
-    L.control.layers(baseLayers, overlays).addTo(map);
-    //L.control.layers(baseLayers, overlays, {collapsed: false}).addTo(map);
-    L.control.zoom({position : 'topleft'}).addTo(map);
+    L.control.layers(baseLayers, overlays).addTo(rkGlobal.map);
+    //L.control.layers(baseLayers, overlays, {collapsed: false}).addTo(rkGlobal.map);
+    L.control.zoom({position : 'topleft'}).addTo(rkGlobal.map);
     addGpsControl();
 
     // callbacks
     window.onresize = setMapHeight();
-    map.on('dblclick', function(e) { zoomByAbout(e) });
-    map.on('zoomend', function(e) { onZoom(); });
+    rkGlobal.map.on('dblclick', function(e) { zoomByAbout(e) });
+    rkGlobal.map.on('zoomend', function(e) { onZoom(); });
     
     
     // load overlay & control
     loadGeoJson();
     
     // register tracking
-    map.on('locationfound', onLocationFound);
-    map.on('locationerror', onLocationError);
+    rkGlobal.map.on('locationfound', onLocationFound);
+    rkGlobal.map.on('locationerror', onLocationError);
     //toggleLocationTracking();
     
     // extra behaviour on small screens
     if($(window).width() < 800) {
-        map.removeControl(map.attributionControl);
+        rkGlobal.map.removeControl(rkGlobal.map.attributionControl);
         
     }
 }
