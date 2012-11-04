@@ -12,9 +12,8 @@ function setMapHeight()
     rkGlobal.map.invalidateSize();
 }
 
-/** zoom to point of origin */
+/** zoom to point of origin (of event)*/
 function zoomByAbout(e) {
-    // requires initialized rkGlobal.map
     var x = .5*$('#map').width(),
         y = .5*$('#map').height(),
         mouse_point = e.containerPoint,
