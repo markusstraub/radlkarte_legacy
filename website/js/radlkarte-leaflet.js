@@ -117,6 +117,8 @@ function filter(type) {
     if(!rkGlobal.showLayer) {
         rkGlobal.map.addLayer(rkGlobal.layer);
         rkGlobal.showLayer = true;
+        // trigger adapting style to (probably) new zoom level
+        onZoom();
     }
     
     debug('filter.. (foreach)');
@@ -188,103 +190,8 @@ function hideMarkerCircle() {
     rkGlobal.map.removeLayer(rkGlobal.markerCircle);
 }
 
-function onLocationFound(e) {
-    var radius = e.accuracy / 2;
-    showMarkerCircle(e.latlng, radius, 10);
-
-	// setView ourselves (because we want to have a minZoom)
-	var minZoom = 13;
-	var latAccuracy = 180 * e.accuracy / 4e7,
-		lngAccuracy = latAccuracy * 2,
-
-		lat = e.latlng.lat,
-		lng = e.latlng.lng,
-
-		sw = new L.LatLng(lat - latAccuracy, lng - lngAccuracy),
-		ne = new L.LatLng(lat + latAccuracy, lng + lngAccuracy),
-		bounds = new L.LatLngBounds(sw, ne),
-
-		options = this._locationOptions;
 
 
-	var zoom = Math.min(rkGlobal.map.getBoundsZoom(bounds), options.maxZoom);
-	// guarantee minZoom!
-	zoom = Math.max(zoom, minZoom);
-	this.setView(e.latlng, zoom);
-}
-
-
-function onLocationError(e) {
-    //alert(e.message);
-}
-
-function getLocationOnce() {
-    if(rkGlobal.tracking) {
-        // ignore for now..
-        return;
-    }
-    rkGlobal.map.locate({
-        watch: false,
-        enableHighAccuracy: true,
-        setView: false,
-        maxZoom: 16
-    });
-}
-
-function toggleLocationTracking() {
-    if(rkGlobal.tracking) {
-        rkGlobal.map.stopLocate();
-    } else {
-        rkGlobal.map.locate({
-            watch: true,
-            enableHighAccuracy: true,
-            setView: false,
-            maxZoom: 16
-        });
-    }
-    
-    rkGlobal.tracking = !rkGlobal.tracking;
-}
-
-function addOverlayControl() {
-    var legend = L.control({position: 'topright'});
-    legend.onAdd = function (map) {
-        var div = L.DomUtil.create('div', 'leaflet-control-layers leaflet-control leaflet-control-layers-expanded');
-        var inner = '';
-        //inner += '<div class="leaflet-top leaflet-right">';
-        //inner += '    <div class="leaflet-control-layers leaflet-control leaflet-control-layers-expanded">';
-        inner += '        <form class="leaflet-control-layers-list">';
-        inner += '            <div class="leaflet-control-layers-base">';
-        inner += '                <label>Wege durch Wien</label>';
-        inner += '            </div>';
-        inner += '            <div class="leaflet-control-layers-separator"></div>';
-        inner += '            <div class="leaflet-control-layers-base">';
-        inner += '                <label><input name="leaflet-base-layers" checked="checked" type="radio" onclick="filter(\'dangerous\');">Sichere Wege</label>';
-        inner += '                <label><input name="leaflet-base-layers" type="radio" onclick="filter(\'slow\');">Schnelle Wege</label>';
-        inner += '                <label><input name="leaflet-base-layers" type="radio" onclick="filter(\'none\');">Alle Wege</label>';
-        inner += '                <label><input name="leaflet-base-layers" type="radio" onclick="hideConnections();">Ausblenden</label>';
-        inner += '            </div>';
-        inner += '        </form>';
-        //inner += '    </div>';
-        //inner += '</div>';
-        div.innerHTML += inner;
-        return div;
-    };
-
-    rkGlobal.map.addControl(legend);
-
-}
-
-function addGpsControl() {
-    var gpsControl = L.control({position: 'topleft'});
-    gpsControl.onAdd = function (map) {
-        var div = L.DomUtil.create('div', 'leaflet-control-zoom leaflet-control');
-        var inner = '<a title="Go to current location" href="#" onclick="getLocationOnce();" class="leaflet-control-gps"></a>';
-        div.innerHTML += inner;
-        return div;
-    };
-    rkGlobal.map.addControl(gpsControl);
-}
 
 function getURLParameter(name) {
     return decodeURI(
@@ -297,6 +204,8 @@ function getURLParameter(name) {
 // ------------------------------------------------------------------------ main
 
 function initMap() {
+    var devMode = getURLParameter("dev") == "yes";
+    
     // set up rkGlobal.map
     rkGlobal.map = L.map('map', {
         doubleClickZoom: false,
@@ -339,16 +248,21 @@ function initMap() {
         "Symbole": poiLayer
     };
 
-    if(getURLParameter("dev") == "yes") {
+    if(devMode) {
         baseLayers["Radlkarte_DEV"] = rkDevLayer;
         overlays["Symbole_DEV"] = poiDevLayer;
     }
     
-    addOverlayControl();    
-    L.control.layers(baseLayers, overlays).addTo(rkGlobal.map);
-    //L.control.layers(baseLayers, overlays, {collapsed: false}).addTo(rkGlobal.map);
+    addOverlayControl({position : 'topright'});
+    
+    if(devMode)
+        L.control.layers(baseLayers, overlays, {collapsed: false}).addTo(rkGlobal.map);
+    else
+        L.control.layers(baseLayers, overlays).addTo(rkGlobal.map);
+    
+    addSearchControl({position : 'topleft'});
+    addGpsControl({position : 'topleft'});
     L.control.zoom({position : 'topleft'}).addTo(rkGlobal.map);
-    addGpsControl();
 
     // callbacks
     window.onresize = setMapHeight();
@@ -367,7 +281,8 @@ function initMap() {
     // extra behaviour on small screens
     if($(window).width() < 800) {
         rkGlobal.map.removeControl(rkGlobal.map.attributionControl);
-        
+        toggleSearchVisibility();
     }
+
 }
 

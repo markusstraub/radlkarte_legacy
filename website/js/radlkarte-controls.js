@@ -56,6 +56,7 @@ function addSearchControl(options) {
     };
     rkGlobal.map.addControl(searchControl);
     
+    // hack to prevent the click being swallowed by the map
     var inputTags = document.getElementsByTagName("input")
     for (var i = 0; i < inputTags.length; i++) {
         inputTags[i].onmouseover = controlEnter;

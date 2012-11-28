@@ -13,6 +13,7 @@ rkGlobal.tracking = false;
 rkGlobal.markerCirle = undefined; // marker circle used to show mapmatched / geolocated position
 rkGlobal.markerCircleTimeout = undefined; // timeout event to hide the marker circle
 
+rkGlobal.searchVisible = true; // should the search-input fields be shown
 
 function debug(obj) {
     if(rkGlobal.debug)

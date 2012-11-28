@@ -140,6 +140,19 @@ a:hover {
 	background-image: url(../img/location.png);
 }
 
+.leaflet-control-search {
+    background-image: url(../img/search.png);
+}
+
 input#address {
     width: 180pt;
+}
+
+input.search-input {
+    margin-left: 4pt;
+    z-index: 15005; !important
+}
+
+a#search-button {
+    display: inline-block;
 }

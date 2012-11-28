@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <head>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-	<title>radlkarte.at - handoptimierte, alltagstaugliche Wege durch Wien</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>radlkarte.at - handoptimierte, alltagstaugliche Wege durch Wien</title>
     
     <!-- for g+ -->
     <meta itemprop="name" content="Radlkarte">
     <meta itemprop="description" content="radlkarte.at - handoptimierte, alltagstaugliche Wege durch Wien">
     <meta itemprop="image" content="http://www.radlkarte.at/img/radlkarte_icon_small.png">
     <link rel="icon" type="image/png" href="img/radlkarte_icon_small.png" />
-	
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css" type="text/css" />
-	<link rel="stylesheet" href="js/leaflet-0.4.5/leaflet.css" />
+    <link rel="stylesheet" href="js/leaflet-0.4.5/leaflet.css" />
     <!--[if lte IE 8]>
         <link rel="stylesheet" href="js/leaflet-0.4.5/leaflet.ie.css" />
     <![endif]-->
@@ -45,32 +45,15 @@
         }(document, 'script', 'facebook-jssdk'));</script>
         
         <div id="connections" class ="shadowy">
-            <div>
-                <input id="address" type="textbox" value="Michaelerplatz, Wien" onclick="clickClear(this, 'Michaelerplatz, Wien')" onblur="clickRecall(this,'Michaelerplatz, Wien')" />
-                <input type="submit" value="↵" onclick="codeAddress()">
-            </div>
-            <script type="text/javascript">
-            function clickClear(thisfield, defaulttext) {
-                    if (thisfield.value == defaulttext) {
-                        thisfield.value = "";
-                    }
-                }
-            function clickRecall(thisfield, defaulttext) {
-                if (thisfield.value == "") {
-                    thisfield.value = defaulttext;
-                }
-            }
-            </script>
-        
             <!-- facebook like & send -->
-	        <div class="fb-like" data-href="http://www.radlkarte.at" data-send="true" data-layout="button_count" data-width="150" data-show-faces="true"></div>
-	    </div>
+            <div class="fb-like" data-href="http://www.radlkarte.at" data-send="true" data-layout="button_count" data-width="150" data-show-faces="true"></div>
+        </div>
     </div>
     
     <!-- map container with mandatory height definition -->
-	<div id="map"></div>
-	
-	<div id="legend">
+    <div id="map"></div>
+    
+    <div id="legend">
         <div id="legend-text" class="shadowy">
             <b>Wegenetz:</b><br/>
             <img src="img/legend_wege.png"/><br/>
@@ -109,15 +92,16 @@
     </script>
     
     <!-- load leaflet and initialize map -->
-	<script src="js/leaflet-0.4.5/leaflet-src.js"></script>
-	<!-- no official permalink feature, so we use a plugin. see https://github.com/CloudMade/Leaflet/issues/362 -->
-	<script src="js/leaflet-hash.js"></script>
-	<script src="js/radlkarte-globals.js"></script>
-	<script src="js/radlkarte-leaflet.js"></script>
-	<script>
-	    initMap();
-	</script>
-	
+    <script src="js/leaflet-0.4.5/leaflet-src.js"></script>
+    <!-- no official permalink feature, so we use a plugin. see https://github.com/CloudMade/Leaflet/issues/362 -->
+    <script src="js/leaflet-hash.js"></script>
+    <script src="js/radlkarte-globals.js"></script>
+    <script src="js/radlkarte-controls.js"></script>
+    <script src="js/radlkarte-leaflet.js"></script>
+    <script>
+        initMap();
+    </script>
+    
     <!-- google maps api (for geocoding) -->
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
     <script src="js/radlkarte-geocoding.js"></script>
