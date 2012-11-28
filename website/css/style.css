@@ -36,11 +36,11 @@ html,body {
     z-index: 15001;
 }
 
-#connections {
+#facebook {
     display: block;
     position: absolute;
-    top: 10px;
-    left: 50px;
+    bottom: 2em;
+    left: 10px;
     z-index: 15000;
     
     float: left;
