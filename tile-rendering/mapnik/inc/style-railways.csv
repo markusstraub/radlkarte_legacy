@@ -1,0 +1,16 @@
+"railway","tunnel","bridge","pass","symbolizer","z6","z7","z8","z9","z10","z11","z12","z13","z14","z15","z16","z17","z18"
+,,,,,,,,,,216672,108336,54168,27084,13542,6771,3385.5,1692.75
+,,,,,,,,,,,,,,,,,
+"rail,subway",,,"fill","line.stroke-linejoin","round","round","round","round","round","round","round","round","round","round","round","round","round"
+"rail,subway",,,"fill","line.stroke-linecap","round","round","round","round","round","round","round","round","round","round","round","round","round"
+"rail,subway",,,"fill","line.stroke","#888","#888","#888","#888","#888","#888","#888","#888","#888","#888","#888","#888","#888"
+"rail,subway",,,"fill","line.stroke-width",1,1,1,1,1,1,1,1,1,1,2,2,2
+"rail,subway",,,"fill","line.stroke-dasharray","4,4","4,4","4,4","4,4","4,4","4,4","4,4","4,4","4,4","4,4","4,4","4,4","4,4"
+"rail,subway","yes",,"fill","line.stroke-width",0.0001,0.0001,0.0001,0.0001,0.0001,0.0001,0.0001,0.0001,0.0001,0.0001,0.0001,0.0001,0.0001
+,,,,,,,,,,,,,,,,,
+"light_rail,narrow_gauge,funicular,tram,spur,siding,miniature,disused,spur-siding-yard",0,0,"fill","line.stroke-linejoin",,,,,,,,"round","round","round","round","round","round"
+"light_rail,narrow_gauge,funicular,tram,spur,siding,miniature,disused,spur-siding-yard",0,0,"fill","line.stroke-linecap",,,,,,,,"round","round","round","round","round","round"
+"light_rail,narrow_gauge,funicular,tram,spur,siding,miniature,disused,spur-siding-yard",0,0,"fill","line.stroke",,,,,,,,"#888","#888","#888","#888","#888","#888"
+"light_rail,narrow_gauge,funicular,tram,spur,siding,miniature,disused,spur-siding-yard",0,0,"fill","line.stroke-width",,,,,,,,1,1,1,2,2,2
+"light_rail,narrow_gauge,funicular,tram,spur,siding,miniature,disused,spur-siding-yard",0,0,"fill","line.stroke-dasharray",,,,,,,,"4,4","4,4","4,4","4,4","4,4","4,4"
+"light_rail,narrow_gauge,funicular,tram,spur,siding,miniature,disused,spur-siding-yard","yes",0,"fill","line.stroke-width",,,,,,,,0.0001,0.0001,0.0001,0.0001,0.0001,0.0001

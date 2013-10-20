@@ -1,0 +1,214 @@
+WORKFLOW
+
+------- db-import
+
+--- set up database
+
+we use a postgresql database named 'gis'
+the import is done with osm2pgsql (slim-mode)
+??? how to set up?
+
+--- regular update
+
+crontab -e (for user markus)
+0 2 * * 7 /home/markus/osm/bin/trunk/updateAustriaMap.sh > /tmp/updateAustriaMap.log 2>&1
+
+------ rendering
+
+--- update the stylesheet
+* cd tile-rendering/mapnik/inc
+* edit spreadnik-styles.ods and save sheets as csv (style-highways.csv, style-cycleways.csv, style-railways.csv)
+* ./regenerate.sh
+*   ./spreadnik.php (first: sudo apt-get install php5-cli)
+*   ./spreadnik_postprocess.sh (first: sudo apt-get install mysql-server-5.5 - for the replace-tool)
+
+--- test intermediate style
+??
+
+--- move new stylesheet to production
+* cd tile-rendering
+* ./updateStableStyle.sh
+
+--- apache2, mod-tile, renderd
+
+program lies in /home/markus/osm/src/mod_tile
+
+to add a new map (osm.xml file) you have to add an entry in:
+- /etc/renderd.conf
+
+then simly reload apache and it should work
+$ sudo /etc/init.d/apache2 reload
+
+try with e.g.
+- http://46.4.66.144/StyleName/12/2233/1419.png
+
+if you changed the stylesheet and want to clear the cache, empty
+- /var/lib/mod_tile/StyleName
+
+
+
+------ syncing the overlay with dropbox:
+
+1) install dropbox on the server: http://www.zimbio.com/Linux/articles/MB-gSHzLm_4/How+Install+Configure+Dropbox+Ubuntu+Server
+2) make a hard link (symlinks do not work - why?) to the geojson in the dropbox folder
+
+
+
+
+
+
+below: old README
+--------------------------------------------------------------------------------
+
+
+my own OSM server.
+
+i followed these tutorials:
+1) http://weait.com/content/build-your-own-openstreetmap-server
+2) http://wiki.openstreetmap.org/wiki/HowTo_mod_tile
+
+
+
+
+-- render a map:
+1) checkout the mapnik style
+2) open spreadnik-styles.ods and export each sheet as csv (e.g. style-highways.csv) 
+3) ./regenerate.sh 1 18 big
+
+
+-- update the db:
+
+markus@geist:~/osm/planet$ ./fetch-current.sh
+markus@geist:~/osm/bin/osm2pgsql$ ./osm2pgsql -S default.style --slim -c -d gis -C 2048 ../../planet/austria.osm.bz2
+
+psql gis
+DELETE FROM planet_osm_line WHERE railway='construction' OR highway='construction' OR NOT construction IS NULL;
+DELETE FROM planet_osm_point WHERE NOT construction IS NULL;
+DELETE FROM planet_osm_polygon WHERE NOT construction IS NULL;
+DELETE FROM planet_osm_line WHERE railway='proposed' OR highway='proposed';
+DELETE FROM planet_osm_line WHERE ((service='driveway' AND access='private') OR footway='sidewalk') AND NOT (bicycle='designated' OR bicycle='official' OR bicycle='yes' OR bicycle='permissive');
+UPDATE planet_osm_line SET public_transport='platform' WHERE highway='platform';
+UPDATE planet_osm_point
+    SET railway='subway_station'
+    WHERE osm_id IN (
+        SELECT p.osm_id
+        FROM planet_osm_point as p, planet_osm_line as l
+        WHERE
+            p.railway='station' AND
+            l.railway='subway' AND
+            p.way && l.way AND
+            ST_DWithin(p.way, l.way, 0.01)
+    );
+ALTER TABLE planet_osm_point ALTER COLUMN capacity SET DEFAULT 0;
+ALTER TABLE planet_osm_point ALTER COLUMN capacity TYPE integer USING to_number(capacity, '999999999');
+\q
+
+
+
+## old metro query:
+SELECT p.name,p.railway 
+    FROM planet_osm_point as p, planet_osm_line as l
+    WHERE
+        p.railway='station' AND
+        l.railway='subway' AND
+        p.way && l.way AND
+        ST_DWithin(p.way, l.way, 0.01);
+
+       
+
+
+
+-- the db:
+
+enter it via:
+psql gis
+\d
+select name from planet_osm_roads where "cycleway:right"='lane';
+
+
+
+TODOs:
+quick'n'hopefully soon:
+POIs: citybike, tankstellen, schlauchstationen, trinkwasser, fahrradgeschäfte, ampeln, klos, radständer
+pflaster einzeichnen??
+
+
+weg mit:
+parkhäusern (unter/oberirdischer wegekram)
+einbahnsymbole auf autobahnen etc
+
+
+verbessern:
+straßennamen (warum failed das an den kachelenden?)
+
+
+her mit:
+übersichtlichem landuse (v.a. grünflächen)
+beschriftungen für landmarks (e.g. augarten, stephansdom,..)
+gebäude.. oder zumindest wichtige gebäude (akh, kirchen, schulen(?), sehenswürdigkeiten) -- landmark/orientierungscharakter!
+
+
+
+
+------------------ automatic rendering with mod_tile and renderd
+
+program lies in /home/markus/osm/src/mod_tile
+
+to add a new map (osm.xml file) you have to add an entry in:
+- /etc/renderd.conf
+
+then simly reload apache and it should work
+$ sudo /etc/init.d/apache2 reload
+
+try with e.g.
+- http://46.4.66.144/StyleName/12/2233/1419.png
+
+if you changed the stylesheet and want to clear the cache, empty
+- /var/lib/mod_tile/StyleName
+
+------------------ datenbankgeplänkel
+
+select railway,name,ST_AsText(way) from planet_osm_line where 
+railway IS NOT NULL and way && (select way from planet_osm_point where osm_id='446001578') and
+ST_Contains(way, (select way from planet_osm_point where osm_id='446001578'));
+
+select ST_AsText(way) from planet_osm_point where osm_id='446001579';
+POINT(1824843.09100735 6143404.89913074)
+
+select railway,name,ST_AsText(way) from planet_osm_line where railway IS NOT NULL and way && (select way from planet_osm_point where osm_id='446001579');
+3
+
+
+select ST_AsText(Intersection(
+        (select way from planet_osm_point where osm_id='446001579'),
+        way
+    )) from planet_osm_line where 
+railway IS NOT NULL and way && (select way from planet_osm_point where osm_id='446001579');
+
+select ST_AsText(Intersection(
+        (select way from planet_osm_point where osm_id='446001579'),
+        way
+    )) from planet_osm_line where 
+railway IS NOT NULL and way && (select way from planet_osm_point where osm_id='446001579');
+
+
+
+
+
+
+
+
+gis=# select ST_AsText(way) from  planet_osm_point where osm_id='446001578';
+                st_astext                 
+------------------------------------------
+ POINT(1824884.83581639 6143300.96204094)
+(1 row)
+
+ LINESTRING(1822444.36 6143070.98,1822676.04 6143140.82,1823503.3 6143373.42,1823748.86 6143422.27,1823933.26 6143433.75,1824083.27 6143426.41,1824188.37 6143410.81,1824362.93 6143382.21,1824508.9 6143359.33,1824655.3 6143337.76,1824884.83 6143300.96,1825024.87 6143269.45,1825619.66 6143166.21,1825912.49 6143164.86,1826212.2 6143164.48,1826373.67 6143163.89,1826452.24 6143157.99,1826516.27 6143146.05)
+(1 row)
+
+select railway,name,ST_AsText(way) from planet_osm_line where 
+railway IS NOT NULL and way && (select way from planet_osm_point where osm_id='446001578') and
+ST_DWithin(way, (select way from planet_osm_point where osm_id='446001578'), 0.01);
+
+yes!

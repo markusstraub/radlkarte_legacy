@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE Map [
+<!ENTITY % entities SYSTEM "inc/entities.xml.inc">
+%entities;
+]>
+<!-- This stylesheet uses features only available IN mapnik builds with
+     libxml2 AS the XML parser. Furthermore, there are other features
+     and behaviour that necessitate an upgrade to mapnik 0.7.1 -->
+<Map bgcolor="#f1eee8" srs="&srs900913;" minimum_version="0.7.1">
+&fontset-settings;
+
+<!-- Style Definitions - they are later used in Layers -->
+
+&style-highways-fill;
+&style-highways-casing;
+&style-highways-fill-links;
+&style-highways-casing-links;
+&style-highways-area-fill;
+&style-highways-area-casing;
+
+&style-highways-fill-bridge;
+&style-highways-casing-bridge;
+&style-highways-fill-links-bridge;
+&style-highways-casing-links-bridge;
+&style-highways-area-fill-bridge;
+&style-highways-area-casing-bridge;
+
+&style-railways-fill;
+
+
+<!-- Layers Definitions
+        they are painted in the order they are specified,
+        so paint casings first, fills afterwards -->
+
+&layer-green;
+&layer-water;
+<!-- &layer-buildings; -->
+<Layer name="highways-area-casing" status="on" srs="&osm2pgsql_projection;">
+    <StyleName>style-highways-area-casing</StyleName>
+    <!--<StyleName>style-highways-area-casing-bridge</StyleName>-->
+    <Datasource>
+      <Parameter name="table">
+      (SELECT way,highway,railway,surface,tracktype,public_transport,
+       CASE WHEN access IS NULL THEN 'unknown'::text WHEN access IN ('yes','true','1','permissive') THEN 'allowed'::text WHEN access IN ('official','designated') THEN 'compulsory'::text ELSE 'forbidden'::text end AS access,
+       CASE WHEN bicycle IS NULL THEN 'unknown'::text WHEN bicycle IN ('yes','true','1','permissive') THEN 'allowed'::text WHEN bicycle IN ('official','designated') THEN 'compulsory'::text ELSE 'forbidden'::text end AS bicycle
+       FROM &prefix;_polygon
+       where highway IN ('residential','unclassified','pedestrian','service','footway','track','path','platform')
+          or railway='platform'
+       ORDER BY z_order,way_area desc) AS roads
+      </Parameter>
+      &datasource-settings;
+    </Datasource>
+</Layer>
+<Layer name="highways-casing" status="on" srs="&osm2pgsql_projection;">
+    <StyleName>style-highways-casing-links</StyleName>
+    <StyleName>style-highways-casing</StyleName>
+    <Datasource>
+      <Parameter name="table">
+      (SELECT way,highway,cycleway,railway,surface,tracktype,horse,foot,aeroway,public_transport,
+       CASE WHEN access IS NULL THEN 'unknown'::text WHEN access IN ('yes','true','1','permissive') THEN 'allowed'::text WHEN access IN ('official','designated') THEN 'compulsory'::text ELSE 'forbidden'::text end AS access,
+       CASE WHEN bicycle IS NULL THEN 'unknown'::text WHEN bicycle IN ('yes','true','1','permissive') THEN 'allowed'::text WHEN bicycle IN ('official','designated') THEN 'compulsory'::text ELSE 'forbidden'::text end AS bicycle,
+       CASE WHEN tunnel IN ('yes','true','1') THEN 'yes'::text ELSE tunnel end AS tunnel,
+       CASE WHEN bridge IN ('yes','true','1') THEN 'yes'::text ELSE bridge end AS bridge
+       FROM &prefix;_line
+       where highway IS NOT NULL
+          or aeroway IN ('runway','taxiway')
+          or railway IN ('rail','subway')
+       ORDER BY z_order) AS roads
+      </Parameter>
+      &datasource-settings;
+    </Datasource>
+</Layer>
+<Layer name="highways-area-fill" status="on" srs="&osm2pgsql_projection;">
+    <StyleName>style-highways-area-fill</StyleName>
+    <!--<StyleName>style-highways-area-fill-bridge</StyleName>-->
+    <Datasource>
+      <Parameter name="table">
+      (SELECT way,highway,railway,aeroway,surface,tracktype,public_transport,
+       CASE WHEN access IS NULL THEN 'unknown'::text WHEN access IN ('yes','true','1','permissive') THEN 'allowed'::text WHEN access IN ('official','designated') THEN 'compulsory'::text ELSE 'forbidden'::text end AS access,
+       CASE WHEN bicycle IS NULL THEN 'unknown'::text WHEN bicycle IN ('yes','true','1','permissive') THEN 'allowed'::text WHEN bicycle IN ('official','designated') THEN 'compulsory'::text ELSE 'forbidden'::text end AS bicycle
+       FROM &prefix;_polygon
+       where highway IN ('residential','unclassified','pedestrian','service','footway','living_street','track','path','platform','services')
+          or railway='platform'
+          or aeroway IN ('runway','taxiway','helipad')
+       ORDER BY z_order,way_area desc) AS roads
+      </Parameter>
+      &datasource-settings;
+    </Datasource>
+</Layer>
+<Layer name="highways-fill" status="on" srs="&osm2pgsql_projection;">
+    <StyleName>style-highways-fill-links</StyleName>    
+    <StyleName>style-highways-fill</StyleName>
+    <StyleName>style-railways-fill</StyleName>
+    <Datasource>
+      <Parameter name="table">
+      (SELECT way,highway,cycleway,"cycleway:left","cycleway:right",railway,surface,tracktype,horse,foot,aeroway,public_transport,
+       CASE WHEN oneway IN ('yes','true','1') THEN 'yes'::text ELSE oneway end AS oneway,
+       CASE WHEN access IS NULL THEN 'unknown'::text WHEN access IN ('yes','true','1','permissive') THEN 'allowed'::text WHEN access IN ('official','designated') THEN 'compulsory'::text ELSE 'forbidden'::text end AS access,
+       CASE WHEN bicycle IS NULL THEN 'unknown'::text WHEN bicycle IN ('yes','true','1','permissive') THEN 'allowed'::text WHEN bicycle IN ('official','designated') THEN 'compulsory'::text ELSE 'forbidden'::text end AS bicycle,
+       CASE WHEN tunnel IN ('yes','true','1') THEN 'yes'::text ELSE tunnel end AS tunnel,
+       CASE WHEN bridge IN ('yes','true','1') THEN 'yes'::text ELSE bridge end AS bridge
+       FROM &prefix;_line
+       where highway IS NOT NULL
+          or aeroway IN ('runway','taxiway')
+          or railway IN ('rail','subway')
+       ORDER BY z_order) AS roads
+      </Parameter>
+      &datasource-settings;
+    </Datasource>
+</Layer>
+<Layer name="highways-bridge" status="on" srs="&osm2pgsql_projection;">
+    <StyleName>style-highways-casing-links-bridge</StyleName>
+    <StyleName>style-highways-casing-bridge</StyleName>
+    <StyleName>style-highways-fill-links-bridge</StyleName>    
+    <StyleName>style-highways-fill-bridge</StyleName>
+    <StyleName>style-railways-fill</StyleName>
+    <Datasource>
+      <Parameter name="table">
+      (SELECT way,highway,cycleway,"cycleway:left","cycleway:right",railway,surface,tracktype,horse,foot,construction,aeroway,service,public_transport,
+       CASE WHEN oneway IN ('yes','true','1') THEN 'yes'::text ELSE oneway end AS oneway,
+       CASE WHEN access IS NULL THEN 'unknown'::text WHEN access IN ('yes','true','1','permissive') THEN 'allowed'::text WHEN access IN ('official','designated') THEN 'compulsory'::text ELSE 'forbidden'::text end AS access,
+       CASE WHEN bicycle IS NULL THEN 'unknown'::text WHEN bicycle IN ('yes','true','1','permissive') THEN 'allowed'::text WHEN bicycle IN ('official','designated') THEN 'compulsory'::text ELSE 'forbidden'::text end AS bicycle,
+       CASE WHEN tunnel IN ('yes','true','1') THEN 'yes'::text ELSE tunnel end AS tunnel,
+       CASE WHEN bridge IN ('yes','true','1') THEN 'yes'::text ELSE bridge end AS bridge
+       FROM &prefix;_line
+       where (highway IS NOT NULL
+          or aeroway IN ('runway','taxiway')
+          or railway IN ('rail','subway'))
+          and bridge='yes'
+       ORDER BY z_order) AS roads
+      </Parameter>
+      &datasource-settings;
+    </Datasource>
+</Layer>
+<!-- &layer-directions; -->
+&layer-roads-text;
+<!-- &layer-placenames; -->
+</Map>
