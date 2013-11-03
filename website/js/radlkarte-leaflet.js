@@ -25,9 +25,9 @@ function zoomByAbout(e) {
 
 // ----------------------------------------------------------- geojson functions
 
-function loadGeoJson() {
+function loadGeoJson(location) {
     // load GeoJSON layer (in separate thread)
-    $.getJSON("data/wege-durch-wien.geojson", function(data) {
+    $.getJSON("data/wege-durch-" + location + ".geojson", function(data) {
         // add all geojson objects to the layer and style them
         var cnt = 0;
         var cntGood = 0;
@@ -205,6 +205,15 @@ function getURLParameter(name) {
 
 function initMap() {
     var devMode = getURLParameter("dev") == "yes";
+    var location = getURLParameter("location"); // wien or linz
+    if(location == null || location == 'null') {
+        location = "wien";
+    }
+    
+    var locationCenters = {
+        "wien": [48.21,16.37],
+        "linz": [48.307,14.286]
+    };
     
     // set up rkGlobal.map
     rkGlobal.map = L.map('map', {
@@ -212,7 +221,7 @@ function initMap() {
         keyboardPanOffset: 200,
         zoomControl: false,
         zoom: 14, 
-        center: [48.21,16.37],
+        center: locationCenters[location],
         maxBounds: [[46.3,9.4], [49.1,17.3]]
     });
     setMapHeight();
@@ -220,9 +229,10 @@ function initMap() {
 
     
     // add layers
-    var rkAttrib = 'Map data &copy; <a href="http://www.openstreetmap.org" target="_blank">OpenStreetMap</a> contributors, Rendering &copy; Markus Straub, Wege durch Wien &copy; Heinrich Flickschuh & Markus Straub';
-    var osmAttrib = 'Map data &copy; <a href="http://www.openstreetmap.org" target="_blank">OpenStreetMap</a> contributors, Wege durch Wien &copy; Heinrich Flickschuh & Markus Straub';
-    var emptyAttrib = 'Wege durch Wien &copy; Heinrich Flickschuh & Markus Straub';
+    var locationUrls = ' — <a href="index.html?location=linz">Linz</a> | <a href="index.html?location=wien">Wien</a>';
+    var rkAttrib = '&copy; <a href="http://www.openstreetmap.org" target="_blank">OpenStreetMap</a> &amp; <a href="about.html">Radlkarte contributors</a>' + locationUrls;
+    var osmAttrib = osmAttrib;
+    var emptyAttrib = '&copy; <a href="about.html">Radlkarte contributors</a>' + locationUrls;
     
     var rkLayer = L.tileLayer('http://radlkarte.at/stable/{z}/{x}/{y}.png', {attribution: rkAttrib}).addTo(rkGlobal.map);
     var rkLowLayer = L.tileLayer('http://radlkarte.at/minimal_radl/{z}/{x}/{y}.png', {attribution: rkAttrib});
@@ -271,7 +281,7 @@ function initMap() {
     
     
     // load overlay & control
-    loadGeoJson();
+    loadGeoJson(location);
     
     // register tracking
     rkGlobal.map.on('locationfound', onLocationFound);
